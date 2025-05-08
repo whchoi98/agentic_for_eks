@@ -1,0 +1,484 @@
+---
+description: 'Update : 2025.05.08'
+---
+
+# Q CLI 기반 MCP 구성하기 1
+
+## Amazon Q Developer CLI: Model Context Protocol(MCP) 활용
+
+## 1. 개요
+
+Model Context Protocol (MCP)는 LLM이 다양한 도구 및 시스템과 통합되도록 해주는 표준 인터페이스입니다. 마치 USB-C가 다양한 장치 간 연결을 통합하듯, MCP는 LLM이 외부 도구 및 데이터를 표준 방식으로 활용할 수 있게 해줍니다.
+
+Amazon Q Developer CLI는 현재 MCP를 베타로 지원하며, Kubernetes API 및 Playwright 기반 브라우저 제어를 예제로 소개합니다.
+
+### 준비 조건
+
+```
+/quit  # 기존 세션 종료
+sudo dnf install -y nodejs20  # MCP 서버 실행을 위한 Node.js 설치
+```
+
+***
+
+## 2. MCP 서버 구성
+
+Amazon Q Developer CLI는 kubectl 없이도 Kubernetes API에 직접 접근할 수 있도록 지원합니다. 이 기능은 MCP 서버를 통해 활성화되며, 실시간으로 클러스터 상태를 파악하거나 명령을 실행할 수 있는 기반이 됩니다.
+
+#### &#x20;MCP 서버란?
+
+MCP(Model Context Protocol)는 LLM이 외부 시스템과 표준화된 방식으로 상호작용할 수 있도록 해주는 오픈 프로토콜입니다.  Amazon Q CLI에서는 \~/.aws/amazonq/mcp.json 파일을 통해 MCP 서버를 설정합니다.
+
+<pre><code><strong># MCP Server 설정
+</strong><strong>~/.aws/amazonq/mcp.json 
+</strong></code></pre>
+
+### 2.1 설정 단계
+
+* **MCP 구성 파일 열기**
+
+```
+code-server ~/.aws/amazonq/mcp.json
+
+```
+
+* json 파일 편집
+
+```
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server@latest"]
+    }
+  }
+}
+```
+
+> 해당 MCP 서버는 GitHub에서 설치 가능하며, npx를 통해 자동 실행됩니다.
+
+* Q CLI 재시작 및 MCP 적용 확인
+
+```
+q chat --trust-all-tools
+
+```
+
+결과 예시:
+
+```
+$ q chat --trust-all-tools
+To learn more about MCP safety, see https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-mcp-security.html
+✓ kubernetes loaded in 8.00 s
+✓ 1 of 1 mcp servers initialized
+
+Welcome to 
+
+ █████╗ ███╗   ███╗ █████╗ ███████╗ ██████╗ ███╗   ██╗     ██████╗ 
+██╔══██╗████╗ ████║██╔══██╗╚══███╔╝██╔═══██╗████╗  ██║    ██╔═══██╗
+███████║██╔████╔██║███████║  ███╔╝ ██║   ██║██╔██╗ ██║    ██║   ██║
+██╔══██║██║╚██╔╝██║██╔══██║ ███╔╝  ██║   ██║██║╚██╗██║    ██║▄▄ ██║
+██║  ██║██║ ╚═╝ ██║██║  ██║███████╗╚██████╔╝██║ ╚████║    ╚██████╔╝
+╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝     ╚══▀▀═╝ 
+                                                        
+
+
+╭───────────────────────── Did you know? ─────────────────────────╮
+│                                                                 │
+│      You can execute bash commands by typing ! followed by      │
+│                           the command                           │
+│                                                                 │
+╰─────────────────────────────────────────────────────────────────╯
+
+
+/help all commands  •  ctrl + j new lines  •  ctrl + k fuzzy search
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All tools are now trusted (!). Amazon Q will execute tools without asking for confirmation.
+Agents can sometimes do unexpected things so understand the risks.
+
+Learn more at https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-chat-security.html#command-line-chat-trustall-safety
+
+```
+
+### 2.2 MCP 기반 호출
+
+아래와 같이 MCP를 호출해 봅니다.
+
+```
+kube-system 네임스페이스에서 실행 중인 파드들은 무엇인가요?
+결과는 표 형태로 보여주세요.
+각 구성 요소가 무엇인지 설명도 함께 제공해 주세요.
+```
+
+결과 예시:
+
+```
+kube-system 네임스페이스에서 실행 중인 파드들을 확인해보겠습니다.
+
+
+🛠️  Using tool: list_pods (trusted) from mcp server kubernetes
+ ⋮ 
+ ● Running list_pods with the param:
+ ⋮  {
+ ⋮    "arguments": {
+ ⋮      "namespace": "kube-system"
+ ⋮    },
+ ⋮    "name": "list_pods"
+ ⋮  }
+ ⋮ 
+ ● Completed in 0.605s
+
+
+
+🛠️  Using tool: fs_write (trusted)
+ ⋮ 
+ ● Path: ../../tmp/kube-system-pods.md
+
+   1,  1: # kube-system 네임스페이스의 파드 목록
+   2,  2: 
+-  3    : | 파드 이름 | 노드 | 상태 | 역할 |
+-  4    : |----------|------|------|------|
+-  5    : | aws-node-5p5tp | ip-10-11-54-206.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+-  6    : | aws-node-8dtqr | ip-10-11-85-207.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+-  7    : | aws-node-cfd6n | ip-10-11-8-145.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+-  8    : | aws-node-cv94n | ip-10-11-35-94.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+-  9    : | aws-node-fbfxh | ip-10-11-54-229.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 10    : | aws-node-rbdtg | ip-10-11-10-49.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 11    : | aws-node-shgdd | ip-10-11-71-150.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 12    : | aws-node-tkvm5 | ip-10-11-29-87.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 13    : | aws-node-v4jdv | ip-10-11-42-156.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 14    : | aws-node-zdpmc | ip-10-11-26-240.ap-northeast-2.compute.internal | Running | AWS VPC CNI 네트워킹 |
+- 15    : | coredns-fd6b6c769-lgcqg | ip-10-11-26-240.ap-northeast-2.compute.internal | Running | DNS 서비스 |
+- 16    : | coredns-fd6b6c769-rc57k | ip-10-11-80-47.ap-northeast-2.compute.internal | Running | DNS 서비스 |
+- 17    : | ebs-csi-controller-7df458c96-qsnmt | ip-10-11-8-145.ap-northeast-2.compute.internal | Running | EBS CSI 컨트롤러 |
+- 18    : | ebs-csi-controller-7df458c96-tw69g | ip-10-11-29-87.ap-northeast-2.compute.internal | Running | EBS CSI 컨트롤러 |
+- 19    : | ebs-csi-node-6n6nv | ip-10-11-26-240.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 20    : | ebs-csi-node-6qfp9 | ip-10-11-29-87.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 21    : | ebs-csi-node-clv97 | ip-10-11-42-156.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 22    : | ebs-csi-node-czcxl | ip-10-11-85-207.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 23    : | ebs-csi-node-ff989 | ip-10-11-80-47.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 24    : | ebs-csi-node-fsk4v | ip-10-11-10-49.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 25    : | ebs-csi-node-gzrmv | ip-10-11-8-145.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 26    : | ebs-csi-node-hghqs | ip-10-11-54-229.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 27    : | ebs-csi-node-hhtnn | ip-10-11-54-206.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 28    : | ebs-csi-node-hpjnv | ip-10-11-71-150.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 29    : | ebs-csi-node-r4zc5 | ip-10-11-35-94.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 30    : | ebs-csi-node-tqvjp | ip-10-11-68-68.ap-northeast-2.compute.internal | Running | EBS CSI 노드 |
+- 31    : | kube-proxy-49jtx | ip-10-11-80-47.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 32    : | kube-proxy-8jccc | ip-10-11-71-150.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 33    : | kube-proxy-b2crn | ip-10-11-8-145.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 34    : | kube-proxy-f5b2s | ip-10-11-85-207.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 35    : | kube-proxy-kzzv8 | ip-10-11-10-49.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 36    : | kube-proxy-m4s86 | ip-10-11-54-229.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 37    : | kube-proxy-pbxms | ip-10-11-35-94.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 38    : | kube-proxy-qtqxn | ip-10-11-26-240.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 39    : | kube-proxy-scdms | ip-10-11-29-87.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 40    : | kube-proxy-wzfb9 | ip-10-11-68-68.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 41    : | kube-proxy-xmw8x | ip-10-11-54-206.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 42    : | kube-proxy-zbmxf | ip-10-11-42-156.ap-northeast-2.compute.internal | Running | 네트워크 프록시 |
+- 43    : | metrics-server-554d7599f4-5sjrs | ip-10-11-10-49.ap-northeast-2.compute.internal | Running | 메트릭 수집 |
+- 44    : | metrics-server-554d7599f4-swn57 | ip-10-11-42-156.ap-northeast-2.compute.internal | Running | 메트릭 수집 |
++      3: | 구성 요소 | 파드 이름 | 상태 | 생성 시간 |
++      4: |----------|----------|------|----------|
++      5: | AWS CNI | aws-node-5p5tp | Running | 2025-05-08T12:30:13.000Z |
++      6: | AWS CNI | aws-node-8dtqr | Running | 2025-05-08T12:30:51.000Z |
++      7: | AWS CNI | aws-node-cfd6n | Running | 2025-05-08T12:30:43.000Z |
++      8: | AWS CNI | aws-node-cv94n | Running | 2025-05-08T12:30:41.000Z |
++      9: | AWS CNI | aws-node-fbfxh | Running | 2025-05-08T12:30:52.000Z |
++     10: | AWS CNI | aws-node-rbdtg | Running | 2025-05-08T12:30:17.000Z |
++     11: | AWS CNI | aws-node-shgdd | Running | 2025-05-08T12:30:16.000Z |
++     12: | AWS CNI | aws-node-tkvm5 | Running | 2025-05-08T12:30:43.000Z |
++     13: | AWS CNI | aws-node-v4jdv | Running | 2025-05-08T12:30:17.000Z |
++     14: | AWS CNI | aws-node-xhgjp | Running | 2025-05-08T12:30:54.000Z |
++     15: | AWS CNI | aws-node-z7stp | Running | 2025-05-08T12:30:16.000Z |
++     16: | AWS CNI | aws-node-zdpmc | Running | 2025-05-08T12:30:13.000Z |
++     17: | CoreDNS | coredns-fd6b6c769-lgcqg | Running | 2025-05-08T12:28:03.000Z |
++     18: | CoreDNS | coredns-fd6b6c769-rc57k | Running | 2025-05-08T12:28:03.000Z |
++     19: | EBS CSI Controller | ebs-csi-controller-7df458c96-qsnmt | Running | 2025-05-08T12:34:59.000Z |
++     20: | EBS CSI Controller | ebs-csi-controller-7df458c96-tw69g | Running | 2025-05-08T12:34:59.000Z |
++     21: | EBS CSI Node | ebs-csi-node-6n6nv | Running | 2025-05-08T12:34:59.000Z |
++     22: | EBS CSI Node | ebs-csi-node-6qfp9 | Running | 2025-05-08T12:34:59.000Z |
++     23: | EBS CSI Node | ebs-csi-node-clv97 | Running | 2025-05-08T12:34:59.000Z |
++     24: | EBS CSI Node | ebs-csi-node-czcxl | Running | 2025-05-08T12:34:59.000Z |
++     25: | EBS CSI Node | ebs-csi-node-ff989 | Running | 2025-05-08T12:34:59.000Z |
++     26: | EBS CSI Node | ebs-csi-node-fsk4v | Running | 2025-05-08T12:34:59.000Z |
++     27: | EBS CSI Node | ebs-csi-node-gzrmv | Running | 2025-05-08T12:34:59.000Z |
++     28: | EBS CSI Node | ebs-csi-node-hghqs | Running | 2025-05-08T12:34:59.000Z |
++     29: | EBS CSI Node | ebs-csi-node-hhtnn | Running | 2025-05-08T12:34:59.000Z |
++     30: | EBS CSI Node | ebs-csi-node-hpjnv | Running | 2025-05-08T12:34:59.000Z |
++     31: | EBS CSI Node | ebs-csi-node-r4zc5 | Running | 2025-05-08T12:34:59.000Z |
++     32: | EBS CSI Node | ebs-csi-node-tqvjp | Running | 2025-05-08T12:34:59.000Z |
++     33: | kube-proxy | kube-proxy-49jtx | Running | 2025-05-08T12:30:16.000Z |
++     34: | kube-proxy | kube-proxy-8jccc | Running | 2025-05-08T12:30:16.000Z |
++     35: | kube-proxy | kube-proxy-b2crn | Running | 2025-05-08T12:30:43.000Z |
++     36: | kube-proxy | kube-proxy-f5b2s | Running | 2025-05-08T12:30:51.000Z |
++     37: | kube-proxy | kube-proxy-kzzv8 | Running | 2025-05-08T12:30:17.000Z |
++     38: | kube-proxy | kube-proxy-m4s86 | Running | 2025-05-08T12:30:52.000Z |
++     39: | kube-proxy | kube-proxy-pbxms | Running | 2025-05-08T12:30:41.000Z |
++     40: | kube-proxy | kube-proxy-qtqxn | Running | 2025-05-08T12:30:13.000Z |
++     41: | kube-proxy | kube-proxy-scdms | Running | 2025-05-08T12:30:43.000Z |
++     42: | kube-proxy | kube-proxy-wzfb9 | Running | 2025-05-08T12:30:54.000Z |
++     43: | kube-proxy | kube-proxy-xmw8x | Running | 2025-05-08T12:30:13.000Z |
++     44: | kube-proxy | kube-proxy-zbmxf | Running | 2025-05-08T12:30:17.000Z |
++     45: | Metrics Server | metrics-server-554d7599f4-5sjrs | Running | 2025-05-08T12:28:04.000Z |
++     46: | Metrics Server | metrics-server-554d7599f4-swn57 | Running | 2025-05-08T12:28:04.000Z |
+  45, 47: 
+- 46    : ## 주요 구성 요소 설명
++     48: ## 구성 요소 설명
+  47, 49: 
+- 48    : ### AWS VPC CNI (aws-node)
+- 49    : - **역할**: Amazon VPC 내에서 Kubernetes 파드에 네트워킹을 제공
+- 50    : - **기능**: 
+- 51    :   - 파드에 VPC IP 주소 할당
+- 52    :   - 노드 간 파드 통신 관리
+- 53    :   - 네트워크 정책 적용
+- 54    : - **구성**: 각 노드에 DaemonSet으로 배포됨
++     50: 1. **AWS CNI (Container Network Interface)**
++     51:    - Amazon EKS 클러스터의 네트워킹을 담당하는 컴포넌트
++     52:    - 각 노드에서 실행되며 파드에 IP 주소를 할당하고 네트워크 통신을 관리
++     53:    - VPC 내에서 파드 간 통신을 가능하게 함
+  55, 54: 
+- 56    : ### CoreDNS
+- 57    : - **역할**: 클러스터 내 DNS 서비스 제공
+- 58    : - **기능**:
+- 59    :   - 서비스 디스커버리
+- 60    :   - 파드 및 서비스 이름 확인
+- 61    :   - DNS 기반 서비스 라우팅
+- 62    : - **구성**: ReplicaSet으로 배포되어 고가용성 보장
++     55: 2. **CoreDNS**
++     56:    - 클러스터 내 DNS 서비스를 제공
++     57:    - 서비스 디스커버리를 위한 DNS 이름 확인 담당
++     58:    - 클러스터 내 서비스 간 통신을 위한 이름 기반 조회 제공
+  63, 59: 
+- 64    : ### EBS CSI Driver
+- 65    : - **역할**: Amazon EBS 볼륨을 Kubernetes 파드에 연결
+- 66    : - **구성 요소**:
+- 67    :   - **컨트롤러(ebs-csi-controller)**: 볼륨 프로비저닝 및 관리
+- 68    :   - **노드(ebs-csi-node)**: 각 노드에서 볼륨 마운트 처리
+- 69    : - **기능**:
+- 70    :   - 동적 볼륨 프로비저닝
+- 71    :   - 볼륨 스냅샷 및 복원
+- 72    :   - 볼륨 확장
++     60: 3. **EBS CSI (Container Storage Interface) Controller & Node**
++     61:    - Controller: AWS EBS 볼륨의 프로비저닝 및 관리 담당
++     62:    - Node: 각 노드에서 실행되며 EBS 볼륨을 파드에 마운트하는 역할
++     63:    - 영구 스토리지를 Kubernetes 파드에 제공
+  73, 64: 
+- 74    : ### kube-proxy
+- 75    : - **역할**: 클러스터 내 네트워크 프록시 및 로드 밸런싱
+- 76    : - **기능**:
+- 77    :   - 서비스 IP 주소에 대한 트래픽 라우팅
+- 78    :   - 노드 간 네트워크 통신 관리
+- 79    :   - iptables 규칙 관리
+- 80    : - **구성**: 각 노드에 DaemonSet으로 배포됨
++     65: 4. **kube-proxy**
++     66:    - 각 노드에서 실행되는 네트워크 프록시
++     67:    - 서비스 추상화를 구현하고 클러스터 내 네트워크 규칙 관리
++     68:    - 파드 간 로드 밸런싱 및 서비스 디스커버리 지원
+  81, 69: 
+- 82    : ### Metrics Server
+- 83    : - **역할**: 클러스터 리소스 사용량 메트릭 수집
+- 84    : - **기능**:
+- 85    :   - CPU 및 메모리 사용량 모니터링
+- 86    :   - Horizontal Pod Autoscaler(HPA)에 메트릭 제공
+- 87    :   - kubectl top 명령어 지원
+- 88    : - **구성**: ReplicaSet으로 배포되어 고가용성 보장
++     70: 5. **Metrics Server**
++     71:    - 클러스터 내 리소스 사용량 메트릭 수집
++     72:    - CPU 및 메모리 사용량 데이터 제공
++     73:    - Horizontal Pod Autoscaler와 같은 자동 확장 기능에 필요한 메트릭 제공
+
+Replacing: ../../tmp/kube-system-pods.md
+
+ ⋮ 
+ ● Completed in 0.0s
+
+
+
+🛠️  Using tool: execute_bash (trusted)
+ ⋮ 
+ ● I will run the following shell command: 
+glow /tmp/kube-system-pods.md
+
+
+  # kube-system 네임스페이스의 파드 목록                                          
+                                                                                  
+  구성 요소         │파드 이름                   │상태   │생성 시간               
+  ──────────────────┼────────────────────────────┼───────┼────────────────────────
+  AWS CNI           │aws-node-5p5tp              │Running│2025-05-08T12:30:13.000Z
+  AWS CNI           │aws-node-8dtqr              │Running│2025-05-08T12:30:51.000Z
+  AWS CNI           │aws-node-cfd6n              │Running│2025-05-08T12:30:43.000Z
+  AWS CNI           │aws-node-cv94n              │Running│2025-05-08T12:30:41.000Z
+  AWS CNI           │aws-node-fbfxh              │Running│2025-05-08T12:30:52.000Z
+  AWS CNI           │aws-node-rbdtg              │Running│2025-05-08T12:30:17.000Z
+  AWS CNI           │aws-node-shgdd              │Running│2025-05-08T12:30:16.000Z
+  AWS CNI           │aws-node-tkvm5              │Running│2025-05-08T12:30:43.000Z
+  AWS CNI           │aws-node-v4jdv              │Running│2025-05-08T12:30:17.000Z
+  AWS CNI           │aws-node-xhgjp              │Running│2025-05-08T12:30:54.000Z
+  AWS CNI           │aws-node-z7stp              │Running│2025-05-08T12:30:16.000Z
+  AWS CNI           │aws-node-zdpmc              │Running│2025-05-08T12:30:13.000Z
+  CoreDNS           │coredns-fd6b6c769-lgcqg     │Running│2025-05-08T12:28:03.000Z
+  CoreDNS           │coredns-fd6b6c769-rc57k     │Running│2025-05-08T12:28:03.000Z
+  EBS CSI Controller│ebs-csi-controller-7df458c9…│Running│2025-05-08T12:34:59.000Z
+  EBS CSI Controller│ebs-csi-controller-7df458c9…│Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-6n6nv          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-6qfp9          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-clv97          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-czcxl          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-ff989          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-fsk4v          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-gzrmv          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-hghqs          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-hhtnn          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-hpjnv          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-r4zc5          │Running│2025-05-08T12:34:59.000Z
+  EBS CSI Node      │ebs-csi-node-tqvjp          │Running│2025-05-08T12:34:59.000Z
+  kube-proxy        │kube-proxy-49jtx            │Running│2025-05-08T12:30:16.000Z
+  kube-proxy        │kube-proxy-8jccc            │Running│2025-05-08T12:30:16.000Z
+  kube-proxy        │kube-proxy-b2crn            │Running│2025-05-08T12:30:43.000Z
+  kube-proxy        │kube-proxy-f5b2s            │Running│2025-05-08T12:30:51.000Z
+  kube-proxy        │kube-proxy-kzzv8            │Running│2025-05-08T12:30:17.000Z
+  kube-proxy        │kube-proxy-m4s86            │Running│2025-05-08T12:30:52.000Z
+  kube-proxy        │kube-proxy-pbxms            │Running│2025-05-08T12:30:41.000Z
+  kube-proxy        │kube-proxy-qtqxn            │Running│2025-05-08T12:30:13.000Z
+  kube-proxy        │kube-proxy-scdms            │Running│2025-05-08T12:30:43.000Z
+  kube-proxy        │kube-proxy-wzfb9            │Running│2025-05-08T12:30:54.000Z
+  kube-proxy        │kube-proxy-xmw8x            │Running│2025-05-08T12:30:13.000Z
+  kube-proxy        │kube-proxy-zbmxf            │Running│2025-05-08T12:30:17.000Z
+  Metrics Server    │metrics-server-554d7599f4-5…│Running│2025-05-08T12:28:04.000Z
+  Metrics Server    │metrics-server-554d7599f4-s…│Running│2025-05-08T12:28:04.000Z
+                                                                                  
+  ## 구성 요소 설명                                                               
+                                                                                  
+  1. **AWS CNI (Container Network Interface)**                                    
+      • Amazon EKS 클러스터의 네트워킹을 담당하는 컴포넌트                        
+      • 각 노드에서 실행되며 파드에 IP 주소를 할당하고 네트워크 통신을 관리       
+      • VPC 내에서 파드 간 통신을 가능하게 함                                     
+  2. **CoreDNS**                                                                  
+      • 클러스터 내 DNS 서비스를 제공                                             
+      • 서비스 디스커버리를 위한 DNS 이름 확인 담당                               
+      • 클러스터 내 서비스 간 통신을 위한 이름 기반 조회 제공                     
+  3. **EBS CSI (Container Storage Interface) Controller & Node**                  
+      • Controller: AWS EBS 볼륨의 프로비저닝 및 관리 담당                        
+      • Node: 각 노드에서 실행되며 EBS 볼륨을 파드에 마운트하는 역할              
+      • 영구 스토리지를 Kubernetes 파드에 제공                                    
+  4. **kube-proxy**                                                               
+      • 각 노드에서 실행되는 네트워크 프록시                                      
+      • 서비스 추상화를 구현하고 클러스터 내 네트워크 규칙 관리                   
+      • 파드 간 로드 밸런싱 및 서비스 디스커버리 지원                             
+  5. **Metrics Server**                                                           
+      • 클러스터 내 리소스 사용량 메트릭 수집                                     
+      • CPU 및 메모리 사용량 데이터 제공                                          
+      • Horizontal Pod Autoscaler와 같은 자동 확장 기능에 필요한 메트릭 제공      
+                                                                                  
+
+
+ ⋮ 
+ ● Completed in 0.18s
+
+
+kube-system 네임스페이스에는 다음과 같은 주요 구성 요소들이 실행 중입니다:
+
+1. AWS CNI (Container Network Interface)
+   • Amazon EKS 클러스터의 네트워킹을 담당하는 컴포넌트
+   • 각 노드에서 실행되며 파드에 IP 주소를 할당하고 네트워크 통신을 관리
+   • VPC 내에서 파드 간 통신을 가능하게 함
+
+2. CoreDNS
+   • 클러스터 내 DNS 서비스를 제공
+   • 서비스 디스커버리를 위한 DNS 이름 확인 담당
+   • 클러스터 내 서비스 간 통신을 위한 이름 기반 조회 제공
+
+3. EBS CSI (Container Storage Interface) Controller & Node
+   • Controller: AWS EBS 볼륨의 프로비저닝 및 관리 담당
+   • Node: 각 노드에서 실행되며 EBS 볼륨을 파드에 마운트하는 역할
+   • 영구 스토리지를 Kubernetes 파드에 제공
+
+4. kube-proxy
+   • 각 노드에서 실행되는 네트워크 프록시
+   • 서비스 추상화를 구현하고 클러스터 내 네트워크 규칙 관리
+   • 파드 간 로드 밸런싱 및 서비스 디스커버리 지원
+
+5. Metrics Server
+   • 클러스터 내 리소스 사용량 메트릭 수집
+   • CPU 및 메모리 사용량 데이터 제공
+   • Horizontal Pod Autoscaler와 같은 자동 확장 기능에 필요한 메트릭 제공
+```
+
+MCP로 추가된 도구들은 아래와 명령을 통해서 확인 할 수 있습니다.
+
+```
+/tools
+```
+
+출력 예시에는 MCP 서버를 통해 추가된 kubernetes\_\_\_ prefix를 가진 도구들이 포함되어 있습니다:
+
+```
+/tools
+
+Tool                                   Permission
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔kubernetes (MCP):
+- kubernetes___stop_port_forward         trusted
+- kubernetes___delete_cronjob            trusted
+- kubernetes___get_job_logs              trusted
+- kubernetes___list_cronjobs             trusted
+- kubernetes___list_nodes                trusted
+- kubernetes___create_service            trusted
+- kubernetes___create_configmap          trusted
+- kubernetes___delete_deployment         trusted
+- kubernetes___update_deployment         trusted
+- kubernetes___create_deployment         trusted
+- kubernetes___delete_namespace          trusted
+- kubernetes___get_events                trusted
+- kubernetes___cleanup                   trusted
+- kubernetes___list_pods                 trusted
+- kubernetes___create_pod                trusted
+- kubernetes___describe_service          trusted
+- kubernetes___set_current_context       trusted
+- kubernetes___list_jobs                 trusted
+- kubernetes___create_namespace          trusted
+- kubernetes___list_namespaces           trusted
+- kubernetes___uninstall_helm_chart      trusted
+- kubernetes___install_helm_chart        trusted
+- kubernetes___delete_service            trusted
+- kubernetes___describe_node             trusted
+- kubernetes___list_contexts             trusted
+- kubernetes___update_service            trusted
+- kubernetes___list_api_resources        trusted
+- kubernetes___create_cronjob            trusted
+- kubernetes___get_logs                  trusted
+- kubernetes___list_services             trusted
+- kubernetes___describe_cronjob          trusted
+- kubernetes___get_current_context       trusted
+- kubernetes___upgrade_helm_chart        trusted
+- kubernetes___port_forward              trusted
+- kubernetes___describe_pod              trusted
+- kubernetes___delete_pod                trusted
+- kubernetes___explain_resource          trusted
+- kubernetes___describe_deployment       trusted
+- kubernetes___list_deployments          trusted
+- kubernetes___scale_deployment          trusted
+
+Built-in:
+- fs_read                                trusted
+- use_aws                                trusted
+- report_issue                           trusted
+- execute_bash                           trusted
+- fs_write                               trusted
+
+
+Trusted tools can be run without confirmation
+
+```
+
+
+
+## 3.요약
+
+| 항목       | 설명                                    |
+| -------- | ------------------------------------- |
+| 도구 설치 여부 | kubectl 설치 없이 Kubernetes API 직접 접근 가능 |
+| 도구 위치    | \~/.aws/amazonq/mcp.json              |
+| 작동 방식    | MCP 서버가 백그라운드에서 API 요청 처리             |
+| 장점       | LLM 기반 CLI의 실시간 클러스터 질문 응답 기능 강화      |

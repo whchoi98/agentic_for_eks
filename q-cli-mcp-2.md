@@ -1,0 +1,432 @@
+# Q CLI 기반 MCP 구성하기 2
+
+## 1. 브라우저 접근 (Playwright + Chrome)
+
+\
+에이전트(Amazon Q CLI)가 웹 브라우저를 통해 인터넷에 접근할 수 있도록 설정하면, 매우 다양한 유스케이스를 지원할 수 있게 됩니다. 이 예제에서는 CLI가 Playwright를 통해 Chrome 브라우저에 접근할 수 있도록 MCP 서버를 설정합니다. 해당 MCP 서버는 GitHub에서 사용할 수 있습니다.
+
+### 1.1 현재 채팅 세션 종료 및 Chrome 설치
+
+* 채팅 세션 종료
+
+```
+/quit
+```
+
+* Chrome 설치
+
+```
+sudo dnf install -y https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+```
+
+### 1.2  mcp.json  파일 업데이트
+
+앞서 설정했던 MCP 설정 파일을 업데이트 합니다.
+
+```
+code-server ~/.aws/amazonq/mcp.json
+```
+
+다음 내용으로 파일을 업데이트합니다.
+
+```
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": ["mcp-server-kubernetes"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--executable-path",
+        "/usr/bin/google-chrome-stable"
+      ]
+    }
+  }
+}
+```
+
+### 1.3  CLI 채팅 세션 재시작
+
+```
+q chat --trust-all-tools
+```
+
+출력 예시:
+
+```
+$ q chat --trust-all-tools
+To learn more about MCP safety, see https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-mcp-security.html
+✓ kubernetes loaded in 1.72 s
+✓ playwright loaded in 4.97 s
+✓ 2 of 2 mcp servers initialized
+
+Welcome to 
+
+ █████╗ ███╗   ███╗ █████╗ ███████╗ ██████╗ ███╗   ██╗     ██████╗ 
+██╔══██╗████╗ ████║██╔══██╗╚══███╔╝██╔═══██╗████╗  ██║    ██╔═══██╗
+███████║██╔████╔██║███████║  ███╔╝ ██║   ██║██╔██╗ ██║    ██║   ██║
+██╔══██║██║╚██╔╝██║██╔══██║ ███╔╝  ██║   ██║██║╚██╗██║    ██║▄▄ ██║
+██║  ██║██║ ╚═╝ ██║██║  ██║███████╗╚██████╔╝██║ ╚████║    ╚██████╔╝
+╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝     ╚══▀▀═╝ 
+                                                        
+
+
+╭───────────────────────── Did you know? ─────────────────────────╮
+│                                                                 │
+│   You can programmatically inject context to your prompts by    │
+│           using hooks. Check out /context hooks help            │
+│                                                                 │
+╰─────────────────────────────────────────────────────────────────╯
+
+
+/help all commands  •  ctrl + j new lines  •  ctrl + k fuzzy search
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All tools are now trusted (!). Amazon Q will execute tools without asking for confirmation.
+Agents can sometimes do unexpected things so understand the risks.
+
+Learn more at https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-chat-security.html#command-line-chat-trustall-safety
+```
+
+***
+
+#### 5️⃣ 사용 가능한 도구 목록 확인
+
+```
+사용가능한 Tool들을 알려줘.
+```
+
+예시 출력:
+
+playwright\_\_로 시작하는 브라우저 도구들이 포함되어 있을 것입니다.
+
+```
+사용가능한 Tool들을 알려줘.
+
+사용 가능한 도구(Tool)들은 다음과 같습니다:
+
+## Kubernetes 관련 도구
+• kubernetes___update_service: Kubernetes 서비스 업데이트
+• kubernetes___upgrade_helm_chart: Helm 차트 업그레이드
+• kubernetes___get_logs: Pod, Deployment, Job 등의 로그 조회
+• kubernetes___list_services: 네임스페이스의 서비스 목록 조회
+• kubernetes___port_forward: Kubernetes 리소스에 포트 포워딩
+• kubernetes___delete_deployment: Deployment 삭제
+• kubernetes___list_cronjobs: CronJob 목록 조회
+• kubernetes___create_namespace: 네임스페이스 생성
+• kubernetes___get_events: Kubernetes 이벤트 조회
+• kubernetes___delete_namespace: 네임스페이스 삭제
+• kubernetes___delete_service: 서비스 삭제
+• kubernetes___install_helm_chart: Helm 차트 설치
+• kubernetes___list_contexts: Kubernetes 컨텍스트 목록 조회
+• kubernetes___scale_deployment: Deployment 스케일링
+• kubernetes___delete_cronjob: CronJob 삭제
+• kubernetes___explain_resource: Kubernetes 리소스 설명
+• kubernetes___list_deployments: Deployment 목록 조회
+• kubernetes___describe_deployment: Deployment 상세 정보 조회
+• kubernetes___describe_service: 서비스 상세 정보 조회
+• kubernetes___set_current_context: 현재 컨텍스트 설정
+• kubernetes___describe_pod: Pod 상세 정보 조회
+• kubernetes___list_namespaces: 네임스페이스 목록 조회
+• kubernetes___describe_node: 노드 상세 정보 조회
+• kubernetes___cleanup: 관리 리소스 정리
+• kubernetes___list_jobs: Job 목록 조회
+• kubernetes___list_nodes: 노드 목록 조회
+• kubernetes___create_configmap: ConfigMap 생성
+• kubernetes___describe_cronjob: CronJob 상세 정보 조회
+• kubernetes___create_pod: Pod 생성
+• kubernetes___get_current_context: 현재 컨텍스트 조회
+• kubernetes___create_service: 서비스 생성
+• kubernetes___stop_port_forward: 포트 포워딩 중지
+• kubernetes___get_job_logs: Job 로그 조회
+• kubernetes___uninstall_helm_chart: Helm 차트 제거
+• kubernetes___list_pods: Pod 목록 조회
+• kubernetes___update_deployment: Deployment 업데이트
+• kubernetes___create_deployment: Deployment 생성
+• kubernetes___list_api_resources: API 리소스 목록 조회
+• kubernetes___delete_pod: Pod 삭제
+• kubernetes___create_cronjob: CronJob 생성
+
+## Playwright 브라우저 관련 도구
+• playwright___browser_handle_dialog: 대화상자 처리
+• playwright___browser_resize: 브라우저 창 크기 조정
+• playwright___browser_tab_list: 브라우저 탭 목록 조회
+• playwright___browser_close: 페이지 닫기
+• playwright___browser_file_upload: 파일 업로드
+• playwright___browser_generate_playwright_test: Playwright 테스트 생성
+• playwright___browser_type: 편집 가능한 요소에 텍스트 입력
+• playwright___browser_tab_new: 새 탭 열기
+• playwright___browser_tab_close: 탭 닫기
+• playwright___browser_console_messages: 콘솔 메시지 조회
+• playwright___browser_navigate_forward: 다음 페이지로 이동
+• playwright___browser_select_option: 드롭다운에서 옵션 선택
+• playwright___browser_wait: 지정된 시간 대기
+• playwright___browser_navigate_back: 이전 페이지로 이동
+• playwright___browser_install: 브라우저 설치
+• playwright___browser_pdf_save: PDF로 페이지 저장
+• playwright___browser_navigate: URL로 이동
+• playwright___browser_hover: 페이지 요소 위에 마우스 호버
+• playwright___browser_take_screenshot: 현재 페이지 스크린샷 촬영
+• playwright___browser_press_key: 키보드 키 누르기
+• playwright___browser_network_requests: 네트워크 요청 조회
+• playwright___browser_tab_select: 탭 선택
+• playwright___browser_snapshot: 현재 페이지의 접근성 스냅샷 캡처
+• playwright___browser_click: 웹 페이지에서 클릭 수행
+• playwright___browser_drag: 두 요소 간 드래그 앤 드롭 수행
+
+## 파일 시스템 및 기타 도구
+• report_issue: 채팅 이슈, 버그, 기능 요청을 보고하기 위한 GitHub 이슈 템플릿 열기
+• fs_read: 파일 읽기 및 디렉토리 조회
+• use_aws: AWS CLI API 호출
+• fs_write: 파일 생성 및 편집
+• execute_bash: Bash 명령 실행
+
+```
+
+***
+
+## 2. 웹 탐색 및 요약 요청 예시
+
+```
+https://docs.aws.amazon.com/eks/latest/best-practices 페이지로 이동하여 비용최적화 섹션을 정리해줘..
+브라우저는 이미 설치되어 있으며, 전체 과정은 하나의 탭에서만 진행해 주세요.
+```
+
+💡 Q CLI는 내부적으로 Playwright를 통해 Chrome을 실행하고, 해당 페이지를 탐색한 뒤  비용최적화 섹션의 내용을 요약하여 제공합니다.
+
+출력 결과 예시:
+
+```
+AWS EKS 비용 최적화 섹션을 확인하기 위해 브라우저를 사용하겠습니다.
+
+
+🛠️  Using tool: browser_navigate (trusted) from mcp server playwright
+ ⋮ 
+ ● Running browser_navigate with the param:
+ ⋮  {
+ ⋮    "arguments": {
+ ⋮      "url": "https://docs.aws.amazon.com/eks/latest/best-practices"
+ ⋮    },
+ ⋮    "name": "browser_navigate"
+ ⋮  }
+ ⋮ 
+ ● Completed in 1.985s
+
+
+
+🛠️  Using tool: browser_click (trusted) from mcp server playwright
+ ⋮ 
+ ● Running browser_click with the param:
+ ⋮  {
+ ⋮    "arguments": {
+ ⋮      "element": "Best Practices for Cost Optimization",
+ ⋮      "ref": "s1e189"
+ ⋮    },
+ ⋮    "name": "browser_click"
+ ⋮  }
+ ⋮ 
+ ● Completed in 1.511s
+
+
+
+🛠️  Using tool: browser_click (trusted) from mcp server playwright
+ ⋮ 
+ ● Running browser_click with the param:
+ ⋮  {
+ ⋮    "arguments": {
+ ⋮      "element": "Framework",
+ ⋮      "ref": "s2e277"
+ ⋮    },
+ ⋮    "name": "browser_click"
+ ⋮  }
+ ⋮ 
+ ● Completed in 1.500s
+
+
+
+🛠️  Using tool: fs_write (trusted)
+ ⋮ 
+ ● Path: /tmp/eks_cost_optimization_summary.md
+
++     1: # Amazon EKS 비용 최적화 모범 사례 요약
++     2: 
++     3: ## 개요
++     4: Amazon EKS 비용 최적화는 최저 비용으로 비즈니스 목표를 달성하는 것을 의미합니다. AWS는 클라우드 경제학 분야에서 Cloud Financial Management(CFM) 프레임워크를 통해 비용 최적화를 위한 방법론을 제공합니다.
++     5: 
++     6: ## 일반 가이드라인
++     7: 1. **인프라 독립성**: 특정 인프라 유형에 종속되지 않는 워크로드 설계 (GPU 등 특수 요구사항 제외)
++     8: 2. **최적의 컨테이너 인스턴스 선택**: CloudWatch Container Insights 등을 활용한 리소스 모니터링 및 프로파일링
++     9: 3. **다양한 구매 옵션 활용**: 온디맨드, 스팟 인스턴스, 절감형 플랜 등 적절한 조합
++    10: 
++    11: ## 비용 최적화 주요 영역
++    12: 1. **비용 효율적 리소스**: 오토스케일링, 다운스케일링, 정책 및 구매 옵션
++    13: 2. **지출 인식**: AWS 및 서드파티 도구를 활용한 비용 모니터링
++    14: 3. **시간에 따른 최적화**: 적절한 크기 조정(Right Sizing)
++    15: 
++    16: ## CFM 프레임워크 4가지 축
++    17: 1. **See(관찰)**: 측정 및 책임
++    18:    - 태깅 전략 정의 및 유지
++    19:    - Kubecost 등을 활용한 EKS 사용량 보고 및 모니터링
++    20:    - 애플리케이션, 사업부, 수익 흐름별 클라우드 비용 할당
++    21:    - 효율성/가치 KPI 정의 및 측정
++    22: 
++    23: 2. **Save(절약)**: 비용 최적화
++    24:    - 낭비 요소 식별 및 제거
++    25:    - 비용 효율성을 위한 아키텍처 설계
++    26:    - 최적의 구매 옵션 선택
++    27:    - 서비스 진화에 따른 적응
++    28: 
++    29: 3. **Plan(계획)**: 계획 및 예측
++    30:    - 클라우드 비용의 동적 예산 책정 및 예측
++    31:    - EKS 컨테이너 서비스가 제공하는 비즈니스 가치 정량화
++    32:    - IT 재무 관리 계획과 EKS 클러스터 비용 관리 통합
++    33: 
++    34: 4. **Run(실행)**: 지속적인 개선
++    35:    - 경영진의 지원 확보
++    36:    - 이해관계자 간 EKS 클러스터 비용에 대한 공통 이해
++    37:    - 비용 가드레일 구현
++    38:    - 조직 요구에 맞는 도구 및 자동화 발전
++    39: 
++    40: ## 주요 비용 요소
++    41: 1. **컴퓨팅 비용**: 다양한 인스턴스 유형, 구매 옵션, 확장성과 가용성 간의 균형
++    42: 2. **네트워킹 비용**: 3개 가용 영역 사용 시 AZ 간 트래픽 비용 증가 가능성
++    43: 3. **스토리지 비용**: 워크로드 특성에 따른 적절한 스토리지 유형 선택
++    44: 
++    45: 비용 최적화는 지속적인 프로세스로, 점진적인 개선을 통해 이루어집니다. 조직의 "FinOps" 노력과 EKS 클러스터 최적화를 통합하기 위해서는 경영진의 지원이 중요합니다.
+
+Creating: /tmp/eks_cost_optimization_summary.md
+
+ ⋮ 
+ ● Completed in 0.0s
+
+
+
+🛠️  Using tool: execute_bash (trusted)
+ ⋮ 
+ ● I will run the following shell command: 
+glow /tmp/eks_cost_optimization_summary.md
+
+
+  # Amazon EKS 비용 최적화 모범 사례 요약                                         
+                                                                                  
+  ## 개요                                                                         
+                                                                                  
+  Amazon EKS 비용 최적화는 최저 비용으로 비즈니스 목표를 달성하는 것을 의미합니다.
+  AWS는 클라우드 경제학 분야에서 Cloud Financial Management(CFM) 프레임워크를 통해
+  비용 최적화를 위한 방법론을 제공합니다.                                         
+                                                                                  
+  ## 일반 가이드라인                                                              
+                                                                                  
+  1. **인프라 독립성**: 특정 인프라 유형에 종속되지 않는 워크로드 설계 (GPU 등    
+  특수 요구사항 제외)                                                             
+  2. **최적의 컨테이너 인스턴스 선택**: CloudWatch Container Insights 등을 활용한 
+  리소스 모니터링 및 프로파일링                                                   
+  3. **다양한 구매 옵션 활용**: 온디맨드, 스팟 인스턴스, 절감형 플랜 등 적절한    
+  조합                                                                            
+                                                                                  
+  ## 비용 최적화 주요 영역                                                        
+                                                                                  
+  1. **비용 효율적 리소스**: 오토스케일링, 다운스케일링, 정책 및 구매 옵션        
+  2. **지출 인식**: AWS 및 서드파티 도구를 활용한 비용 모니터링                   
+  3. **시간에 따른 최적화**: 적절한 크기 조정(Right Sizing)                       
+                                                                                  
+  ## CFM 프레임워크 4가지 축                                                      
+                                                                                  
+  1. **See(관찰)**: 측정 및 책임                                                  
+      • 태깅 전략 정의 및 유지                                                    
+      • Kubecost 등을 활용한 EKS 사용량 보고 및 모니터링                          
+      • 애플리케이션, 사업부, 수익 흐름별 클라우드 비용 할당                      
+      • 효율성/가치 KPI 정의 및 측정                                              
+  2. **Save(절약)**: 비용 최적화                                                  
+      • 낭비 요소 식별 및 제거                                                    
+      • 비용 효율성을 위한 아키텍처 설계                                          
+      • 최적의 구매 옵션 선택                                                     
+      • 서비스 진화에 따른 적응                                                   
+  3. **Plan(계획)**: 계획 및 예측                                                 
+      • 클라우드 비용의 동적 예산 책정 및 예측                                    
+      • EKS 컨테이너 서비스가 제공하는 비즈니스 가치 정량화                       
+      • IT 재무 관리 계획과 EKS 클러스터 비용 관리 통합                           
+  4. **Run(실행)**: 지속적인 개선                                                 
+      • 경영진의 지원 확보                                                        
+      • 이해관계자 간 EKS 클러스터 비용에 대한 공통 이해                          
+      • 비용 가드레일 구현                                                        
+      • 조직 요구에 맞는 도구 및 자동화 발전                                      
+                                                                                  
+                                                                                  
+  ## 주요 비용 요소                                                               
+                                                                                  
+  1. **컴퓨팅 비용**: 다양한 인스턴스 유형, 구매 옵션, 확장성과 가용성 간의 균형  
+  2. **네트워킹 비용**: 3개 가용 영역 사용 시 AZ 간 트래픽 비용 증가 가능성       
+  3. **스토리지 비용**: 워크로드 특성에 따른 적절한 스토리지 유형 선택            
+                                                                                  
+  비용 최적화는 지속적인 프로세스로, 점진적인 개선을 통해 이루어집니다. 조직의    
+  "FinOps" 노력과 EKS 클러스터 최적화를 통합하기 위해서는 경영진의 지원이         
+  중요합니다.                                                                     
+
+
+ ⋮ 
+ ● Completed in 0.16s
+
+
+
+🛠️  Using tool: browser_close (trusted) from mcp server playwright
+ ⋮ 
+ ● Running browser_close with the param:
+ ⋮  {
+ ⋮    "arguments": {},
+ ⋮    "name": "browser_close"
+ ⋮  }
+ ⋮ 
+ ● Completed in 0.78s
+
+
+Amazon EKS 비용 최적화 모범 사례 요약:
+
+## 개요
+Amazon EKS 비용 최적화는 최저 비용으로 비즈니스 목표를 달성하는 것을 의미합니다. AWS는 클라우드 경제학 분야에서 Cloud Financial Management(CFM) 프레임워크를 통해 비용 최적화를 위한 방법론을 제공합니다.
+
+## 일반 가이드라인
+1. 인프라 독립성: 특정 인프라 유형에 종속되지 않는 워크로드 설계 (GPU 등 특수 요구사항 제외)
+2. 최적의 컨테이너 인스턴스 선택: CloudWatch Container Insights 등을 활용한 리소스 모니터링 및 프로파일링
+3. 다양한 구매 옵션 활용: 온디맨드, 스팟 인스턴스, 절감형 플랜 등 적절한 조합
+
+## 비용 최적화 주요 영역
+1. 비용 효율적 리소스: 오토스케일링, 다운스케일링, 정책 및 구매 옵션
+2. 지출 인식: AWS 및 서드파티 도구를 활용한 비용 모니터링
+3. 시간에 따른 최적화: 적절한 크기 조정(Right Sizing)
+
+## CFM 프레임워크 4가지 축
+1. See(관찰): 측정 및 책임
+   • 태깅 전략 정의 및 유지
+   • Kubecost 등을 활용한 EKS 사용량 보고 및 모니터링
+   • 애플리케이션, 사업부, 수익 흐름별 클라우드 비용 할당
+   • 효율성/가치 KPI 정의 및 측정
+
+2. Save(절약): 비용 최적화
+   • 낭비 요소 식별 및 제거
+   • 비용 효율성을 위한 아키텍처 설계
+   • 최적의 구매 옵션 선택
+   • 서비스 진화에 따른 적응
+
+3. Plan(계획): 계획 및 예측
+   • 클라우드 비용의 동적 예산 책정 및 예측
+   • EKS 컨테이너 서비스가 제공하는 비즈니스 가치 정량화
+   • IT 재무 관리 계획과 EKS 클러스터 비용 관리 통합
+
+4. Run(실행): 지속적인 개선
+   • 경영진의 지원 확보
+   • 이해관계자 간 EKS 클러스터 비용에 대한 공통 이해
+   • 비용 가드레일 구현
+   • 조직 요구에 맞는 도구 및 자동화 발전
+
+## 주요 비용 요소
+1. 컴퓨팅 비용: 다양한 인스턴스 유형, 구매 옵션, 확장성과 가용성 간의 균형
+2. 네트워킹 비용: 3개 가용 영역 사용 시 AZ 간 트래픽 비용 증가 가능성
+3. 스토리지 비용: 워크로드 특성에 따른 적절한 스토리지 유형 선택
+
+비용 최적화는 지속적인 프로세스로, 점진적인 개선을 통해 이루어집니다. 조직의 "FinOps" 노력과 EKS 클러스터 최적화를 통합하기 위해서는 경영진의 지원이 중요합니다.
+```
