@@ -7,5 +7,6 @@
   * [Amazon EKS 환경에서의 Q CLI](3.-q-cli/amazon-eks-q-cli.md)
   * [Amazon Q Developer CLI 도구](3.-q-cli/amazon-q-developer-cli.md)
   * [Amazon Q Developer CLI의 Context Management](3.-q-cli/amazon-q-developer-cli-context-management.md)
-* [Q CLI 기반 MCP 구성하기 1](q-cli-mcp-1.md)
-* [Q CLI 기반 MCP 구성하기 2](q-cli-mcp-2.md)
+* [4. Q CLI 기반 MCP 구성하기 1](4.-q-cli-mcp-1.md)
+* [5. Q CLI 기반 MCP 구성하기 2](5.-q-cli-mcp-2.md)
+* [6. EKS 활용 사례 1](6.-eks-1.md)
