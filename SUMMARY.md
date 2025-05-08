@@ -10,3 +10,4 @@
 * [4. Q CLI 기반 MCP 구성하기 1](4.-q-cli-mcp-1.md)
 * [5. Q CLI 기반 MCP 구성하기 2](5.-q-cli-mcp-2.md)
 * [6. EKS 활용 사례 1](6.-eks-1.md)
+* [7. EKS 활용 사례 2 (TBD)](7.-eks-2-tbd.md)
