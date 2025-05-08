@@ -22,7 +22,7 @@ Agentic for EKS는 Amazon Q Developer CLI와 Model Context Protocol(MCP)을 활�
 * Kustomize 기반 샘플 애플리케이션
 * Markdown 다이어그램 출력 예시
 
-#### 🧪 주요 유즈케이스
+#### 🧪 주요 UseCase
 
 * EKS 클러스터 상태 점검 (pods, deployments, IAM, addons 등)
 * YAML 기반 애플리케이션 업데이트 및 롤링 배포
