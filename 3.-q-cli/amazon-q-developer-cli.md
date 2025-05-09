@@ -92,7 +92,7 @@ Amazon Q Developer CLI는 시스템 및 AWS 리소스와 상호작용할 수 있
 
 워크스페이스 내 파일을 분석하거나 생성할 수 있습니다.
 
-예시:
+예시 프롬프트:
 
 ```
 이 워크스페이스에 어떤 파일이 있지?
@@ -141,13 +141,13 @@ Amazon Q Developer CLI는 시스템 및 AWS 리소스와 상호작용할 수 있
 이 중에서 방금 생성한 nginx-deployment.yaml 파일이 Kubernetes nginx 배포를 위한 YAML 파일입니다.
 ```
 
-예시. 파이썬 스크립트를 생성해 보세요:
+예시. 파이썬 스크립트를 생성 프롬프트:
 
 ```
 ap-northeast-2 리전에 있는 EKS 노드를 나열하는 간단한 파이썬 스크립트를 이 디렉터리에 생성해줘.
 ```
 
-예시에 대한 결과
+예시에 대한 결과:
 
 ```
 ap-northeast-2 리전에 있는 EKS 노드를 나열하는 파이썬 스크립트를 생성하겠습니다.
@@ -318,7 +318,7 @@ fs\_read, fs\_write 도구가 사용되며, 신뢰되지 않은 경우 사전 �
 
 kubectl을 활용해 클러스터와 상호작용하는 명령도 실행할 수 있습니다.
 
-* 예시:
+* 예시 프롬프트:
 
 ```
 ap-northeast-2에 있는 내 Kubernetes 클러스터에서 실행 중인 파드를 보여줘.
@@ -433,7 +433,7 @@ kubectl get pods --all-namespaces
 
 AWS 리소스와 상호작용할 수 있습니다.
 
-* 예시:
+* 예시 프롬프트:
 
 ```
 ad-ap-northeast-2에 있는 EKS 클러스터들을 모두 나열해줘.
