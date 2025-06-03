@@ -1,5 +1,5 @@
 ---
-description: 'update : 2025.05.07'
+description: 'Update : 2025.06.03'
 ---
 
 # 3. Q CLI 소개 및 구성
