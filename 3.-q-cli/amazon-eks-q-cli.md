@@ -112,7 +112,7 @@ EKS 클러스터를 보호하기 위한 모범 사례는 다음과 같습니다:
 * 예시2. nginx 배포 YAML 생성 프롬프트:
 
 ```
-이 디렉터리에 nginx-deployment.yaml이라는 이름으로 기본 Kubernetes nginx 배포를 위한 YAML 파일을 생성해주세요.
+~/environment/myeks 디렉토리에 nginx-deployment.yaml이라는 이름으로 기본 Kubernetes nginx 배포를 위한 YAML 파일을 생성해주세요.
 
 ```
 

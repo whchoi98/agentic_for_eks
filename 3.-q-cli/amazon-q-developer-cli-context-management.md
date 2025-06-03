@@ -79,9 +79,9 @@ Created profile: test_k8s_profile
 
 ### **4.1  컨텍스트 파일 추가**
 
-```
-!cat > ./kubernetes_standards.md << 'EOF'
-# Kubernetes 배포 표준
+<pre><code><strong># shell 에서 실행합니다.
+</strong><strong>cat > ~/environment/myeks/kubernetes_standards.md &#x3C;&#x3C; 'EOF'
+</strong># Kubernetes 배포 표준
 
 ## 일반 가이드라인
 - 모든 Kubernetes 리소스는 다음과 같은 라벨을 반드시 포함해야 합니다:
@@ -116,7 +116,7 @@ ports:
   containerPort: 8080
   protocol: TCP
 EOF
-```
+</code></pre>
 
 ### 4.2 컨텍스트로 추가:
 
@@ -449,6 +449,10 @@ Switched to profile: default
 글로벌 컨텍스트는 모든 프로파일에 공통 적용되므로, 자주 사용하는 지침이나 규칙을 공유할 때 유용합니다. 글로벌 컨텍스트를 관리하는 방법은 여러 가지가 있지만, 여기서는 .amazonq/rules 디렉터리를 사용하는 방식을 소개합니다.
 
 ```bash
+!cd ~/environment/myeks
+```
+
+```
 !mkdir -p .amazonq/rules
 ```
 
@@ -463,11 +467,37 @@ Q CLI가 항상 지정된 AWS 리전과 EKS 클러스터를 사용하도록 글�
 EOF
 ```
 
+Global Context에 적용되었는지 확인해 봅니다.
+
+```
+/context show
+```
+
+```
+/context show
+
+🌍 global:
+    .amazonq/rules/**/*.md (1 match)
+    README.md 
+    AmazonQ.md 
+    global-standards.md 
+
+👤 profile (default):
+    <none>
+
+1 matched file in use:
+🌍 /home/ec2-user/environment/myeks/.amazonq/rules/aws.md (~70 tkns)
+
+Total: ~70 tokens
+```
+
 이제 아래와 같은 질문을 하면 이 설정이 자동으로 반영됩니다:
 
 ```
-ap-northeast-2 리전에 있는 EKS 클러스터를 확인해보겠습니다.
+ap-northeast-2 리전에 있는 EKS 클러스터를 확인.
+```
 
+```
 
 🛠️  Using tool: use_aws (trusted)
  ⋮ 
@@ -480,8 +510,6 @@ Region: ap-northeast-2
 Label: List EKS clusters in ap-northeast-2 region
  ⋮ 
  ● Completed in 0.562s
-
-
 
 🛠️  Using tool: use_aws (trusted)
  ⋮ 
@@ -497,8 +525,6 @@ Label: Get details of the eksworkshop cluster
  ⋮ 
  ● Completed in 0.673s
 
-
-
 🛠️  Using tool: use_aws (trusted)
  ⋮ 
  ● Running aws cli command:
@@ -512,8 +538,6 @@ Region: ap-northeast-2
 Label: List nodegroups in the eksworkshop cluster
  ⋮ 
  ● Completed in 0.605s
-
-
 
 🛠️  Using tool: use_aws (trusted)
  ⋮ 
@@ -530,8 +554,6 @@ Label: Get details of the managed-ng-private-01 nodegroup
  ⋮ 
  ● Completed in 0.660s
 
-
-
 🛠️  Using tool: use_aws (trusted)
  ⋮ 
  ● Running aws cli command:
@@ -546,11 +568,6 @@ Region: ap-northeast-2
 Label: Get details of the managed-ng-public-01 nodegroup
  ⋮ 
  ● Completed in 0.630s
-
-
-
-
-
 
 ap-northeast-2 리전에 다음과 같은 EKS 클러스터가 있습니다:
 
@@ -865,16 +882,49 @@ glow /tmp/table_example.md
 더 자세한 정보는 [AWS 공식 문서](https://aws.amazon.com/products/)를 참조하세요.
 ```
 
+EKS Node를 glow 를 활용해서 분석해 봅니다.
+
+```
+eks node들을 분석해줘
+```
+
 ### 5.3  **대화 기록 초기화**
 
 대화 기록을 초기화하려면 /clear 명령어를 사용하면 됩니다.
 
 새로운 주제를 시작할 때나 컨텍스트 한도에 근접했을 때 이 명령을 사용하는 것이 권장됩니다.
 
+현재 token 사용량을 확인해 봅니다.
+
+```
+/usage
+```
+
+아래와 같은 결과를 확인할 수 있습니다.
+
+```
+> /usage
+
+Current context window (48690 of 200k tokens used)
+|████████████████████████████████████████████████████████████████████████████████ 24.34%
+
+█ Context files: ~380 tokens (0.19%)
+█ Q responses:   ~5870 tokens (2.93%)
+█ Your prompts:  ~42440 tokens (21.22%)
+
+
+💡 Pro Tips:
+Run /compact to replace the conversation history with its summary
+Run /clear to erase the entire chat history
+Run /context show to see tokens per context file
+```
+
 ```
 /clear
 
 ```
+
+c;ldl
 
 **실행 결과**
 
@@ -886,6 +936,14 @@ Are you sure? This will erase the conversation history and context from hooks fo
 > y
 
 Conversation history cleared.
+
+```
+
+
+
+
+
+```
 ```
 
 ## 6.`/compact` 로 대화 요약하기
