@@ -924,7 +924,18 @@ Run /context show to see tokens per context file
 
 ```
 
-c;ldl
+**token 결과를 확인하면 아래와 같습니다.**
+
+```
+> /usage
+
+Current context window (380 of 200k tokens used)
+|████████████████████████████████████████████████████████████████████████████████ 0.19%
+
+█ Context files: ~380 tokens (0.19%)
+█ Q responses:   ~0 tokens (0.00%)
+█ Your prompts:  ~0 tokens (0.00%)
+```
 
 **실행 결과**
 
@@ -937,13 +948,6 @@ Are you sure? This will erase the conversation history and context from hooks fo
 
 Conversation history cleared.
 
-```
-
-
-
-
-
-```
 ```
 
 ## 6.`/compact` 로 대화 요약하기
