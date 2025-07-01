@@ -61,7 +61,7 @@ Amazon Q Developer CLI는 시스템 및 AWS 리소스와 상호작용할 수 있
 모든 도구를 한 번에 신뢰하여 원활한 환경 구성:
 
 ```
-/tools trustall
+/tools trust-all
 ```
 
 초기 설정으로 되돌릴 때:
