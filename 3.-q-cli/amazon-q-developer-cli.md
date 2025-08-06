@@ -101,44 +101,40 @@ Amazon Q Developer CLI는 시스템 및 AWS 리소스와 상호작용할 수 있
 예시에 대한 결과:
 
 ```
-현재 워크스페이스에 있는 파일을 확인해보겠습니다.
+현재 워크스페이스에는 다음과 같은 파일들이 있습니다:
 
+## 주요 디렉토리 구조:
 
-🛠️  Using tool: fs_read (trusted)
- ⋮ 
- ● Reading directory: /home/ec2-user with maximum depth of 0
- ⋮ 
- ● Completed in 0.0s
+홈 디렉토리 (/home/ec2-user):
+• .aws/ - AWS CLI 설정
+• .kube/ - Kubernetes 설정
+• environment/ - 개발 환경 파일들
+• output/ - 출력 파일들
+• q/ - Amazon Q CLI 관련 파일들
+• 기타 설정 파일들 (.bashrc, .bash_profile 등)
 
+environment/myeks/ 디렉토리:
+• CloudFormation 템플릿들: EKSVPC.yml, EKSVPC3AZ.yml 등 다양한 VPC 구성
+• eksctl 설정 파일들: eksworkshop-cluster.yaml, whchoi-cluster.yaml 등
+• Kubernetes 매니페스트들: 
+  • nginx-deployment.yaml (방금 생성한 파일)
+  • calico.yaml, aws-k8s-cni.yaml 등 네트워킹 관련
+  • alb-ingress-controller.yaml 등 인그레스 관련
+• 하위 디렉토리들:
+  • alb-controller/ - ALB 컨트롤러 관련
+  • calico_demo/ - Calico 네트워킹 데모
+  • csi/ - Container Storage Interface 관련
+  • fargate/ - Fargate 관련 설정
+  • helm-chart-demo/ - Helm 차트 데모
+  • ingress/ - 인그레스 설정들
+  • istio/ - Istio 서비스 메시 관련
+  • karpenter/ - Karpenter 오토스케일링 관련
+  • Storage/ - 스토리지 관련 설정
 
-현재 워크스페이스에 있는 파일 및 디렉터리는 다음과 같습니다:
+output/ 디렉토리:
+• eks-security-best-practices.md - EKS 보안 모범 사례 문서
 
-1. 방금 생성한 파일:
-   • nginx-deployment.yaml (Kubernetes nginx 배포 YAML 파일)
-
-2. 구성 파일 및 디렉터리:
-   • .bash_profile, .bashrc, .bash_logout (Bash 쉘 설정)
-   • .zshrc, .zprofile (Zsh 쉘 설정)
-   • .aws 디렉터리 (AWS CLI 구성)
-   • .kube 디렉터리 (Kubernetes 구성)
-   • .ssh 디렉터리 (SSH 키 및 구성)
-
-3. 도구 및 유틸리티:
-   • helm-v3.16.4-linux-amd64.tar.gz (Helm 패키지)
-   • linux-amd64 디렉터리
-   • .kubectl_completion, .helm_completion (쉘 자동완성 스크립트)
-   • .fzf 디렉터리 (Fuzzy Finder 도구)
-
-4. Amazon Q 관련:
-   • q.zip
-   • q 디렉터리
-   • .amazon-q.dotfiles.bak 디렉터리
-
-5. 기타:
-   • environment 디렉터리
-   • ec2_vscode 디렉터리
-
-이 중에서 방금 생성한 nginx-deployment.yaml 파일이 Kubernetes nginx 배포를 위한 YAML 파일입니다.
+이 워크스페이스는 EKS 클러스터 관리와 Kubernetes 개발을 위한 다양한 리소스들이 잘 정리되어 있는 환경입니다.
 ```
 
 예시. 파이썬 스크립트를 생성 프롬프트:
@@ -319,49 +315,50 @@ boto3 가 설치되어 있지 않기 때문에, Shell 에서 에러가 발생하
 boto3가 설치가 되면 python code를 실행해 봅니다.
 
 ```
-$ /home/ec2-user/environment/myeks/list_eks_nodes.py
+$ python3 ~/environment/myeks/list_eks_nodes.py
+🎯 EKS 노드 목록 조회 도구
+⏰ 실행 시간: 2025-08-06 02:06:57
 
-ap-northeast-2 리전의 EKS 노드 정보를 조회합니다...
+🔍 ap-northeast-2 리전의 EKS 클러스터 및 노드 정보를 조회합니다...
 
+================================================================================
+📋 총 1개의 EKS 클러스터를 발견했습니다.
 
-클러스터: eksworkshop
+🏗️  클러스터: eksworkshop
+------------------------------------------------------------
+   상태: ACTIVE
+   버전: 1.31
+   엔드포인트: https://ACA8ACA476298B673DF87D7BED190995.gr7.ap-northeast-2.eks.amazonaws.com
+   생성일: 2025-08-05 15:39:37
+
+   📦 노드 그룹 (2개):
+     • managed-ng-private-01
+       - 상태: ACTIVE
+       - 인스턴스 타입: m6i.xlarge
+       - AMI 타입: AL2_x86_64
+       - 용량 타입: ON_DEMAND
+       - 스케일링: 최소 3, 원하는 3, 최대 6
+       - 서브넷: subnet-0955e022578e4fd64, subnet-0401c81b9e6502b7a, subnet-0b145c54494bce17a
+       - 실행 중인 인스턴스 (3개):
+         * i-0806a5637a35e051c (running) - m6i.xlarge
+         * i-0838c0643fd4e1008 (running) - m6i.xlarge
+         * i-09cd6efe259c436a8 (running) - m6i.xlarge
+
+     • managed-ng-public-01
+       - 상태: ACTIVE
+       - 인스턴스 타입: m6i.xlarge
+       - AMI 타입: AL2_x86_64
+       - 용량 타입: ON_DEMAND
+       - 스케일링: 최소 3, 원하는 3, 최대 6
+       - 서브넷: subnet-04638ee0e421dec5d, subnet-01e79cf458cdaefe9, subnet-0d171dd83e589cee6
+       - 실행 중인 인스턴스 (3개):
+         * i-066454061f7e7f3bc (running) - m6i.xlarge
+         * i-0d1d3808520924b43 (running) - m6i.xlarge
+         * i-0c2e973d4b7ab65b2 (running) - m6i.xlarge
+
 ================================================================================
 
-노드 그룹: managed-ng-private-01
---------------------------------------------------------------------------------
-  상태: ACTIVE
-  인스턴스 타입: m6i.xlarge
-  용량 유형: ON_DEMAND
-  디스크 크기: N/A GB
-  최소 크기: 3
-  최대 크기: 6
-  원하는 크기: 3
-
-  노드 (3개):
-  ------------------------------------------------------------------------------
-  인스턴스 ID              인스턴스 타입         상태         프라이빗 IP         퍼블릭 IP          시작 시간               
-  ------------------------------------------------------------------------------
-  i-03575edd6c7f0441c  m6i.xlarge      running    10.11.90.242    N/A             2025-06-03 13:04:57 
-  i-0580ea64c4b7f21e5  m6i.xlarge      running    10.11.60.68     N/A             2025-06-03 13:04:56 
-  i-0327985f0bde78e46  m6i.xlarge      running    10.11.66.68     N/A             2025-06-03 13:04:57 
-
-노드 그룹: managed-ng-public-01
---------------------------------------------------------------------------------
-  상태: ACTIVE
-  인스턴스 타입: m6i.xlarge
-  용량 유형: ON_DEMAND
-  디스크 크기: N/A GB
-  최소 크기: 3
-  최대 크기: 6
-  원하는 크기: 3
-
-  노드 (3개):
-  ------------------------------------------------------------------------------
-  인스턴스 ID              인스턴스 타입         상태         프라이빗 IP         퍼블릭 IP          시작 시간               
-  ------------------------------------------------------------------------------
-  i-0006f6ff5b8145e1a  m6i.xlarge      running    10.11.35.116    3.36.64.66      2025-06-03 13:04:57 
-  i-070b9233e6a599435  m6i.xlarge      running    10.11.8.158     3.34.131.33     2025-06-03 13:04:57 
-  i-0478737cb3f8b463d  m6i.xlarge      running    10.11.17.108    3.38.133.130    2025-06-03 13:04:57 
+✅ 조회 완료!
 ```
 
 ***
@@ -375,113 +372,13 @@ kubectl을 활용해 클러스터와 상호작용하는 명령도 실행할 수 
 * 예시 프롬프트:
 
 ```
-ap-northeast-2에 있는 내 Kubernetes 클러스터에서 실행 중인 파드를 보여줘.
+ap-northeast-2에 있는 내 Kubernetes 클러스터에서 실행 중인 파드를 보여주세요.
+결과는 ~/output 디렉토리에 markdown으로 저장해 주세요.
 ```
 
 execute\_bash 도구가 사용되며, 신뢰되지 않았다면 사전 확인을 요청합니다.
 
-* 예시에 대한 결과:
-
-```
-ap-northeast-2 리전에 있는 Kubernetes 클러스터의 실행 중인 파드를 확인하기 위해서는 kubectl 명령어를 사용해야 합니다. 먼저 현재 구성된 컨텍스트를 확인하고 파드를 조회해보겠습니다.
-
-
-🛠️  Using tool: execute_bash (trusted)
- ⋮ 
- ● I will run the following shell command: 
-kubectl config current-context
-
-i-0f1e10a1cd00fb1cb@eksworkshop.ap-northeast-2.eksctl.io
-
- ⋮ 
- ● Completed in 0.32s
-
-
-
-🛠️  Using tool: execute_bash (trusted)
- ⋮ 
- ● I will run the following shell command: 
-kubectl get pods --all-namespaces
-
-NAMESPACE     NAME                                 READY   STATUS    RESTARTS   AGE
-kube-system   aws-node-5p5tp                       2/2     Running   0          5h1m
-kube-system   aws-node-8dtqr                       2/2     Running   0          5h
-kube-system   aws-node-cfd6n                       2/2     Running   0          5h
-kube-system   aws-node-cv94n                       2/2     Running   0          5h
-kube-system   aws-node-fbfxh                       2/2     Running   0          5h
-kube-system   aws-node-rbdtg                       2/2     Running   0          5h1m
-kube-system   aws-node-shgdd                       2/2     Running   0          5h1m
-kube-system   aws-node-tkvm5                       2/2     Running   0          5h
-kube-system   aws-node-v4jdv                       2/2     Running   0          5h1m
-kube-system   aws-node-xhgjp                       2/2     Running   0          5h
-kube-system   aws-node-z7stp                       2/2     Running   0          5h1m
-kube-system   aws-node-zdpmc                       2/2     Running   0          5h1m
-kube-system   coredns-fd6b6c769-lgcqg              1/1     Running   0          5h3m
-kube-system   coredns-fd6b6c769-rc57k              1/1     Running   0          5h3m
-kube-system   ebs-csi-controller-7df458c96-qsnmt   6/6     Running   0          4h56m
-kube-system   ebs-csi-controller-7df458c96-tw69g   6/6     Running   0          4h56m
-kube-system   ebs-csi-node-6n6nv                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-6qfp9                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-clv97                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-czcxl                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-ff989                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-fsk4v                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-gzrmv                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-hghqs                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-hhtnn                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-hpjnv                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-r4zc5                   3/3     Running   0          4h56m
-kube-system   ebs-csi-node-tqvjp                   3/3     Running   0          4h56m
-kube-system   kube-proxy-49jtx                     1/1     Running   0          5h1m
-kube-system   kube-proxy-8jccc                     1/1     Running   0          5h1m
-kube-system   kube-proxy-b2crn                     1/1     Running   0          5h
-kube-system   kube-proxy-f5b2s                     1/1     Running   0          5h
-kube-system   kube-proxy-kzzv8                     1/1     Running   0          5h1m
-kube-system   kube-proxy-m4s86                     1/1     Running   0          5h
-kube-system   kube-proxy-pbxms                     1/1     Running   0          5h
-kube-system   kube-proxy-qtqxn                     1/1     Running   0          5h1m
-kube-system   kube-proxy-scdms                     1/1     Running   0          5h
-kube-system   kube-proxy-wzfb9                     1/1     Running   0          5h
-kube-system   kube-proxy-xmw8x                     1/1     Running   0          5h1m
-kube-system   kube-proxy-zbmxf                     1/1     Running   0          5h1m
-kube-system   metrics-server-554d7599f4-5sjrs      1/1     Running   0          5h3m
-kube-system   metrics-server-554d7599f4-swn57      1/1     Running   0          5h3m
-
- ⋮ 
- ● Completed in 0.598s
-
-
-
-
-현재 ap-northeast-2 리전에 있는 Kubernetes 클러스터(eksworkshop.ap-northeast-2.eksctl.io)에서 실행 중인 파드 목록입니다:
-
-현재 모든 파드는 kube-system 네임스페이스에서 실행 중이며, 모두 Running 상태입니다:
-
-1. 네트워킹 관련 파드:
-   • aws-node: 12개 (VPC CNI 플러그인)
-   • kube-proxy: 12개 (네트워크 프록시)
-
-2. DNS 관련 파드:
-   • coredns: 2개 (클러스터 DNS 서비스)
-
-3. 스토리지 관련 파드:
-   • ebs-csi-controller: 2개 (EBS CSI 컨트롤러)
-   • ebs-csi-node: 12개 (EBS CSI 노드 에이전트)
-
-4. 모니터링 관련 파드:
-   • metrics-server: 2개 (클러스터 메트릭 수집)
-
-현재 기본 시스템 파드만 실행 중이며, 사용자 애플리케이션 파드는 보이지 않습니다. 이전에 생성한 nginx-deployment.yaml 파일을 적용하지 않았거나, 다른 네임스페이스에 배포되었을 수 있습니다.
-
-특정 네임스페이스의 파드만 보려면 다음 명령어를 사용할 수 있습니다:
-bash
-kubectl get pods -n <namespace>
-
-
-모든 네임스페이스의 파드를 보는 명령어는 이미 실행했습니다:
-bash
-kubectl get pods --all-namespaces
-```
+* 결과 예시:
 
 ### **7.2 AWS CLI 통합**
 
@@ -493,93 +390,34 @@ AWS 리소스와 상호작용할 수 있습니다.
 ap-northeast-2에 있는 EKS 클러스터들을 모두 나열해줘.
 ```
 
-* 예시 결과:
+* 결과 예시:
+  * [markdown](https://www.notion.so/whchoi98/eks-pods-status-24704ef7e60e80bca095f0b87059c1c3?source=copy_link)
 
 ```
-ap-northeast-2 리전에 있는 EKS 클러스터들을 나열해보겠습니다.
+ap-northeast-2 리전의 EKS 클러스터에서 실행 중인 파드 현황을 조회하여 /home/ec2-user/output/eks-pods-status.md 파일에 저장했습니다.
 
+## 주요 발견사항:
 
-🛠️  Using tool: use_aws (trusted)
- ⋮ 
- ● Running aws cli command:
+클러스터 현황:
+• 클러스터명: eksworkshop
+• Kubernetes 버전: v1.31.11-eks-3abbec1
+• 총 노드: 12개 (모두 Ready 상태)
+• 총 파드: 42개 (모두 Running 상태)
 
-Service name: eks
-Operation name: list-clusters
-Parameters: 
-Profile name: default
-Region: ap-northeast-2
-Label: List EKS clusters in ap-northeast-2 region
- ⋮ 
- ● Completed in 0.578s
+파드 구성:
+• AWS VPC CNI: 12개 (네트워킹)
+• kube-proxy: 12개 (서비스 프록시)
+• EBS CSI: 14개 (스토리지 - 컨트롤러 2개 + 노드 드라이버 12개)
+• CoreDNS: 2개 (DNS 서비스)
+• Metrics Server: 2개 (메트릭 수집)
 
+클러스터 상태:
+• ✅ 모든 시스템 구성요소 정상 작동
+• ✅ 재시작 없이 안정적 운영 (10시간 가동)
+• ✅ 고가용성 구성 (중요 구성요소 다중 인스턴스)
+• ✅ 퍼블릭/프라이빗 노드 그룹 균형 배치
 
-
-🛠️  Using tool: use_aws (trusted)
- ⋮ 
- ● Running aws cli command:
-
-Service name: eks
-Operation name: describe-cluster
-Parameters: 
-- name: "eksworkshop"
-Profile name: default
-Region: ap-northeast-2
-Label: Get details of the eksworkshop cluster
- ⋮ 
- ● Completed in 0.693s
-
-
-
-🛠️  Using tool: use_aws (trusted)
- ⋮ 
- ● Running aws cli command:
-
-Service name: eks
-Operation name: list-nodegroups
-Parameters: 
-- clusterName: "eksworkshop"
-Profile name: default
-Region: ap-northeast-2
-Label: List nodegroups in the eksworkshop cluster
- ⋮ 
- ● Completed in 0.607s
-
-
-
-
-ap-northeast-2 리전에서 다음과 같은 EKS 클러스터를 찾았습니다:
-
-### EKS 클러스터 정보
-
-클러스터 이름: eksworkshop
-• **상태**: ACTIVE
-• **버전**: 1.31
-• **생성 시간**: 2025-05-08 12:18:47 UTC
-• **플랫폼 버전**: eks.25
-
-### 네트워크 구성
-• **VPC ID**: vpc-0f37cd2f69f5248bf
-• **서브넷**: 6개 서브넷 구성
-• **퍼블릭 액세스**: 활성화 (0.0.0.0/0에서 접근 가능)
-• **프라이빗 액세스**: 비활성화
-• **서비스 CIDR**: 172.20.0.0/16
-• **IP 패밀리**: IPv4
-
-### 노드 그룹 (2개)
-1. managed-ng-private-01: 프라이빗 노드 그룹
-2. managed-ng-public-01: 퍼블릭 노드 그룹
-
-### 보안 구성
-• **암호화**: 시크릿 암호화 활성화 (KMS 키 사용)
-• **OIDC 발급자**: 구성됨
-• **로깅**: API, 감사, 인증자, 컨트롤러 매니저, 스케줄러 로그 활성화
-
-### 추가 정보
-• **클러스터는 eksctl로 생성됨** (태그 정보에서 확인)
-• **인증 모드**: API_AND_CONFIG_MAP
-• **업그레이드 정책**: EXTENDED 지원 타입
-
-이 클러스터는 현재 정상적으로 작동 중이며(ACTIVE 상태), 프라이빗 및 퍼블릭 노드 그룹을 모두 포함하고 있습니다.
+현재 클러스터는 시스템 파드만 실행 중인 깨끗한 상태로, 애플리케이션 워크로드를 배포할 준비가 완료되어 있습니다. 모든 핵심 구성요소가 정상적으로 작동하고 있어 안정적인 운영 환경을 제공하고 있습니다.
 ```
 
 이 경우 aws cli 도구가 사용되며, 신뢰되지 않은 경우 확인을 요청합니다.

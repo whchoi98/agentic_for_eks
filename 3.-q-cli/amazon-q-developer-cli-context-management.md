@@ -30,12 +30,12 @@ description: 'Update : 2025.05.07'
 
 ***
 
-## 3. 프로파일 관리
+## 3.  a관e리t
 
 ### **3.1 프로파일 목록 보기**
 
 ```
-/profile list
+/agent list
 ```
 
 결과 예시

@@ -1,3 +1,7 @@
+---
+description: 'Update : 2025.08.06'
+---
+
 # Amazon EKS 환경에서의 Q CLI
 
 ***
@@ -59,55 +63,34 @@ Welcome to
 
 ```
 “EKS 클러스터를 보호하기 위한 몇 가지 모범 사례는 무엇인가요?”
+~/output 디렉토리에 결과를 markdown으로 저장해 주세요.
 
 ```
 
-* 실제 결과
+* 실제 결과 예시
 
 ```
-EKS 클러스터를 보호하기 위한 모범 사례는 다음과 같습니다:
+EKS 클러스터 보안 모범 사례를 정리하여 /home/ec2-user/output/eks-security-best-practices.md 파일에 저장했습니다.
 
-1. 네트워크 보안
-   • 프라이빗 서브넷에 워커 노드 배치
-   • 보안 그룹을 사용하여 트래픽 제한
-   • AWS PrivateLink 또는 VPC 엔드포인트 사용
+주요 보안 영역별로 다음과 같은 내용을 포함했습니다:
 
-2. IAM 및 RBAC 구성
-   • 최소 권한 원칙 적용
-   • IAM 역할과 Kubernetes RBAC 통합
-   • 서비스 계정에 IAM 역할 사용 (IRSA)
+• 클러스터 접근 제어: API 서버 보안, IAM 및 RBAC 통합
+• 네트워크 보안: 네트워크 정책, 보안 그룹 구성
+• 파드 보안: Pod Security Standards, 컨테이너 이미지 보안
+• 시크릿 관리: AWS Secrets Manager 통합, IRSA 활용
+• 로깅 및 모니터링: CloudWatch, GuardDuty, Falco 활용
+• 노드 보안: 워커 노드 강화, 런타임 보안
+• 데이터 보호: 저장 및 전송 중 암호화
+• 컴플라이언스: 정책 관리, CIS 벤치마크 준수
+• 백업 및 재해 복구: Velero, 멀티 AZ 구성
+• 지속적인 보안 관리: 자동화, 교육, 인시던트 대응
 
-3. 암호화 및 보안 설정
-   • EKS 클러스터 및 EBS 볼륨에 대한 암호화 활성화
-   • Secrets 암호화 구현
-   • AWS KMS 키 사용
-
-4. 컨테이너 보안
-   • 신뢰할 수 있는 이미지만 사용
-   • 이미지 스캐닝 구현 (ECR 스캐닝 또는 서드파티 도구)
-   • 컨테이너 실행 시 루트 권한 제한
-
-5. 모니터링 및 감사
-   • AWS CloudTrail 활성화
-   • Amazon GuardDuty EKS Protection 사용
-   • Kubernetes 감사 로그 활성화
-
-6. 패치 및 업데이트
-   • EKS 클러스터 및 노드 그룹 정기적 업데이트
-   • 자동 업데이트 메커니즘 구현
-
-7. 추가 보안 도구
-   • AWS Security Hub 사용
-   • AWS Config 규칙 구현
-   • Calico 또는 AWS VPC CNI 플러그인을 통한 네트워크 정책 적용
-
-8. Pod 보안
-   • Pod Security Standards 적용
-   • SecurityContext 설정으로 권한 제한
-   • 리소스 제한 설정
-
-이러한 모범 사례를 구현하면 EKS 클러스터의 보안 태세를 크게 향상시킬 수 있습니다.
+각 섹션에는 구체적인 구현 방법과 설정 예시도 포함되어 있어 실제 적용 시 참고하실 수 있습니다.
 ```
+
+[Markdown 예시](https://whchoi98.notion.site/eks-security-best-practices-24704ef7e60e8081a2a9d32be8ebf829?source=copy_link)
+
+
 
 * 예시2. nginx 배포 YAML 생성 프롬프트:
 
@@ -221,7 +204,7 @@ kubectl get services
 | /clear   | 현재 세션의 히스토리 초기화                            |
 | /reset   | 전체 대화 맥락 초기화 (컨텍스트 제거)                     |
 | /tools   | Q가 사용할 수 있는 도구 목록 및 권한 관리                  |
-| /profile | 다양한 Q 프로파일 관리                              |
+| /agent   | 다양한 Q agent 관리                             |
 | /context | 대화에 사용되는 컨텍스트 파일 관리                        |
 | /compact | 대화 히스토리를 요약하여 컨텍스트 최적화                     |
 
