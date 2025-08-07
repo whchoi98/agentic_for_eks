@@ -1,5 +1,5 @@
 ---
-description: 'update : 2025.05.07'
+description: 'update : 2025.08.07'
 ---
 
 # Agentic/MCP for EKS
